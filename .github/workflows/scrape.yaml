@@ -1,16 +1,18 @@
-name: Scrape ScoreHero Leaderboard
+name: ScoreHero Leaderboard
 
 on:
   schedule:
-    - cron: '0 * * * *' # every hour
+    - cron: '0 1 * * *'  # daily at 1 AM
   workflow_dispatch:
 
-jobs:
-  scrape:
-    runs-on: ubuntu-latest
+permissions: write-all
 
+jobs:
+  scrape_scorehero:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -25,3 +27,11 @@ jobs:
 
       - name: Run scraper
         run: node scraper.js
+
+      - name: Commit and push leaderboard JSON
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add leaderboards/
+          git commit -m "Update ScoreHero leaderboard"
+          git push
