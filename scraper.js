@@ -6,7 +6,10 @@ const URL = "https://www.scorehero.com/rankings.php?group=4&game=6&diff=4&song=1
 
 async function scrapeLeaderboard() {
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ 
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
     await page.goto(URL, { waitUntil: "domcontentloaded" });
     await page.waitForSelector("table");
