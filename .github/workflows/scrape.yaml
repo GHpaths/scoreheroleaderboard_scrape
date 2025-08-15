@@ -2,33 +2,26 @@ name: Scrape ScoreHero Leaderboard
 
 on:
   schedule:
-    # Runs every day at 00:00 UTC
-    - cron: '0 0 * * *'
-  workflow_dispatch: # allows manual trigger
+    - cron: '0 * * * *' # every hour
+  workflow_dispatch:
 
 jobs:
   scrape:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run leaderboard scraper
+      - name: Install Chromium for Puppeteer
+        run: npx puppeteer install
+
+      - name: Run scraper
         run: node scraper.js
-
-      - name: Commit updated leaderboard
-        run: |
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git add leaderboard.json
-          git diff --quiet && echo "No changes to commit" || git commit -m "Update leaderboard [skip ci]"
-          git push
