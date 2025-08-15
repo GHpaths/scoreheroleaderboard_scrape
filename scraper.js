@@ -14,7 +14,10 @@ if (!fs.existsSync(OUTPUT_DIR)) {
 
 // --- Helper function to scrape a single leaderboard ---
 async function scrapeLeaderboard(url) {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("table");
