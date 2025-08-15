@@ -1,0 +1,33 @@
+name: Scrape Leaderboard
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # every 30 minutes
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install puppeteer
+
+      - name: Run scraper
+        run: node scraper.js
+
+      - name: Commit updated leaderboard
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add public/leaderboard.json
+          git commit -m "Update leaderboard"
+          git push
