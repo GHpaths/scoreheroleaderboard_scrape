@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortnite Festival Paths</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Burbank+Big+Condensed:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    
+    <div class="container">
+        <div class="credits-button" id="creditsButton">?</div>
+
+        <div class="modal" id="creditsModal">
+            <div class="modal-content">
+                <span class="close-button" id="closeButton">&times;</span>
+                <p style="line-height: 3.0;"> <!-- Adjust the value as needed -->
+                    <strong>Created by <a href="https://x.com/FregRB" target="_blank">Freg</a>.</strong><br>
+                    Paths generated using <a href="https://github.com/GenericMadScientist/CHOpt" target="_blank">CHOpt</a> by 
+                    GenericMadScientist.<br>
+                    Leaderboard data provided by <a href="https://fnlookup.github.io/festival/" target="_blank">FNLookup</a> by 
+                    tposejank.<br>
+                    Additional Programming from <a href="https://github.com/scoot556" target="_blank">Scoot556</a>.<br>
+                    Inspired by <a href="https://rbpv.online/" target="_blank">RBPV.online</a>.<br>
+                    <strong><a href="https://github.com/GenericMadScientist/CHOpt/blob/main/misc/How-to-read-paths.md" target="_blank">Learn how to read these paths.</a></strong><br>
+                    Contact me on <a href="https://x.com/FregRB" target="_blank">Twitter</a> for any suggestions/bug reports.<br>
+                    *CHOpt squeeze percent is 20%.*
+                </p>
+            </div>
+        </div>
+        <h1>Fortnite Festival Paths</h1>
+        <div class="search-box">
+            <label for="song-search" hidden>Enter song name:</label>
+            <input type="text" id="song-search" placeholder="Search for a song..." oninput="showSuggestions()">
+            <div class="suggestions" id="suggestions"></div>
+        </div>
+
+            <!-- ADD NEW INSTRUMENTS HERE -->
+            <div class="instrument-buttons-container" style="display: none;">
+                <div class="instrument-buttons">
+                    <button id="vocals-btn" class="instrument-button" style="display: none;" data-instrument="vocals">
+                        <img src="img/vocals.png" alt="Vocals">
+                    </button>
+                    <button id="lead-btn" class="instrument-button" style="display: none;" data-instrument="lead">
+                        <img src="img/guitar.png" alt="Lead">
+                    </button>
+                    <button id="bass-btn" class="instrument-button" style="display: none;" data-instrument="bass">
+                        <img src="img/bass.png" alt="Bass">
+                    </button>
+                    <button id="drums-btn" class="instrument-button" style="display: none;" data-instrument="drums">
+                        <img src="img/drums.png" alt="Drums">
+                    </button>
+                    <button id="pro-lead-btn" class="instrument-button" style="display: none;" data-instrument="pro-lead">
+                        <img src="img/pro_guitar.png" alt="Pro Lead">
+                    </button>
+                    <button id="pro-bass-btn" class="instrument-button" style="display: none;" data-instrument="pro-bass">
+                        <img src="img/pro_bass.png" alt="Pro Bass">
+                    </button>
+                </div>
+            </div>
+
+
+        <div id="song-details" class="song-details">
+            <!-- Song details will be displayed here -->
+        </div>
+
+        <div class="gpath-container">
+            <button id="toggle-g-image-btn" class="button" style="display: none;">Show Path Image</button>
+            <div id="g-image-box" style="display: none;">
+                <img id="g-image" class="gpImage" alt="Guitar Path Image">
+            </div>
+        </div>
+        
+        <!-- New Button and Leaderboard Box -->
+        <div class="leaderboard-container">
+            <button id="show-b-hiscore-btn" class="button" style="display: none;">Show Leaderboard</button>
+            <button id="go-to-top" style="display: none;">Go to Top</button>
+            <div id="b-hiscore-box" class="hiscore-box" style="display: none;">
+                <div class="scrollable-table-container-b">
+                    <table id="b-leaderboard-table">
+                        <thead style="text-align: center;">
+                            <tr>
+                                <th style="padding: 0px 0px; width: 10%; text-align: left;">Rank</th>
+                                <th style="padding: 10px 20px; flex-grow: 2;">Player</th>
+                                <th style="padding: 10px 20px; width: 20%;">Score</th>
+                                <th style="padding: 20px 30px; width: 20%;">Accuracy</th>
+                                <th style="padding: 10px 20px; width: 10%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="b-hiscore-table" style="text-align: center; padding: 1em;">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+
+    <script src="fnfp.js"></script>
+    <script>
+        const creditsButton = document.getElementById('creditsButton');
+        const creditsModal = document.getElementById('creditsModal');
+        const closeButton = document.getElementById('closeButton');
+
+        creditsButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent the click from closing the modal
+            creditsModal.style.display = 'flex';
+        });
+
+        closeButton.addEventListener('click', () => {
+            creditsModal.style.display = 'none';
+        });
+
+        document.addEventListener('click', () => {
+            creditsModal.style.display = 'none';
+        });
+
+        // Remove e.stopPropagation() here to allow clicks on the background to close the modal
+        creditsModal.addEventListener('click', () => {
+            creditsModal.style.display = 'none';
+        });
+
+        const leaderboardContainer = document.querySelector('.scrollable-table-container-b');
+        const goToTopButton = document.getElementById('go-to-top');
+        
+        leaderboardContainer.addEventListener('scroll', function () {
+            goToTopButton.style.display = leaderboardContainer.scrollTop > 50 ? 'block' : 'none';
+        });
+        
+        goToTopButton.addEventListener('click', function () {
+            leaderboardContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        const searchInput = document.getElementById('song-search');
+        const suggestionsBox = document.querySelector('.suggestions');
+        
+        let currentInstrument = 'g'; // Default to Pro Lead (guitar)
+        
+        document.getElementById('pro-lead-btn').addEventListener('click', () => {
+    currentInstrument = 'g'; // Pro Lead (Guitar)
+    if (selectedSong) {
+        selectSong(selectedSong); // Update if a song is selected
+        fetchLeaderboard(selectedSong.data.shortname); // Fetch leaderboard data for the selected song
+
+        const leaderboardBox = document.getElementById('b-hiscore-box');
+        const leaderboardButton = document.getElementById('show-b-hiscore-btn');
+        const pathimageButton = document.getElementById('toggle-g-image-btn');
+
+        pathimageButton.textContent = 'Show Path Image';
+
+        // Close the leaderboard if it's open
+        if (leaderboardBox.style.display === 'block') {
+            leaderboardBox.style.display = 'none';
+            leaderboardButton.textContent = 'Show Leaderboard';
+            goToTopButton.style.display = 'none'; // Hide "Go to Top" when leaderboard is hidden
+        }
+    }
+});
+
+// ADD NEW INSTRUMENTS HERE
+document.getElementById('pro-bass-btn').addEventListener('click', () => {
+    currentInstrument = 'b'; // Pro Bass
+    if (selectedSong) {
+        selectSong(selectedSong); // Update if a song is selected
+        fetchLeaderboard(selectedSong.data.shortname); // Fetch leaderboard data for the selected song
+
+        const leaderboardBox = document.getElementById('b-hiscore-box');
+        const leaderboardButton = document.getElementById('show-b-hiscore-btn');
+        const pathimageButton = document.getElementById('toggle-g-image-btn');
+
+        pathimageButton.textContent = 'Show Path Image';
+
+        // Close the leaderboard if it's open
+        if (leaderboardBox.style.display === 'block') {
+            leaderboardBox.style.display = 'none';
+            leaderboardButton.textContent = 'Show Leaderboard';
+            goToTopButton.style.display = 'none'; // Hide "Go to Top" when leaderboard is hidden
+        }
+    }
+});
+
+document.getElementById('drums-btn').addEventListener('click', () => {
+    currentInstrument = 'd'; // Drums
+    if (selectedSong) {
+        selectSong(selectedSong); // Update if a song is selected
+        fetchLeaderboard(selectedSong.data.shortname); // Fetch leaderboard data for the selected song
+
+        const leaderboardBox = document.getElementById('b-hiscore-box');
+        const leaderboardButton = document.getElementById('show-b-hiscore-btn');
+        const pathimageButton = document.getElementById('toggle-g-image-btn');
+
+        pathimageButton.textContent = 'Show Path Image';
+
+        // Close the leaderboard if it's open
+        if (leaderboardBox.style.display === 'block') {
+            leaderboardBox.style.display = 'none';
+            leaderboardButton.textContent = 'Show Leaderboard';
+            goToTopButton.style.display = 'none'; // Hide "Go to Top" when leaderboard is hidden
+        }
+    }
+});
+
+document.getElementById('vocals-btn').addEventListener('click', () => {
+    currentInstrument = 'v'; // Vocals
+    if (selectedSong) {
+        selectSong(selectedSong); // Update if a song is selected
+        fetchLeaderboard(selectedSong.data.shortname); // Fetch leaderboard data for the selected song
+
+        const leaderboardBox = document.getElementById('b-hiscore-box');
+        const leaderboardButton = document.getElementById('show-b-hiscore-btn');
+        const pathimageButton = document.getElementById('toggle-g-image-btn');
+
+        pathimageButton.textContent = 'Show Path Image';
+
+        // Close the leaderboard if it's open
+        if (leaderboardBox.style.display === 'block') {
+            leaderboardBox.style.display = 'none';
+            leaderboardButton.textContent = 'Show Leaderboard';
+            goToTopButton.style.display = 'none'; // Hide "Go to Top" when leaderboard is hidden
+        }
+    }
+});
+
+document.getElementById('lead-btn').addEventListener('click', () => {
+    currentInstrument = 'l'; // Lead
+    if (selectedSong) {
+        selectSong(selectedSong); // Update if a song is selected
+        fetchLeaderboard(selectedSong.data.shortname); // Fetch leaderboard data for the selected song
+
+        const leaderboardBox = document.getElementById('b-hiscore-box');
+        const leaderboardButton = document.getElementById('show-b-hiscore-btn');
+        const pathimageButton = document.getElementById('toggle-g-image-btn');
+
+        pathimageButton.textContent = 'Show Path Image';
+
+        // Close the leaderboard if it's open
+        if (leaderboardBox.style.display === 'block') {
+            leaderboardBox.style.display = 'none';
+            leaderboardButton.textContent = 'Show Leaderboard';
+            goToTopButton.style.display = 'none'; // Hide "Go to Top" when leaderboard is hidden
+        }
+    }
+});
+
+document.getElementById('bass-btn').addEventListener('click', () => {
+    currentInstrument = 'm'; // Bass
+    if (selectedSong) {
+        selectSong(selectedSong); // Update if a song is selected
+        fetchLeaderboard(selectedSong.data.shortname); // Fetch leaderboard data for the selected song
+
+        const leaderboardBox = document.getElementById('b-hiscore-box');
+        const leaderboardButton = document.getElementById('show-b-hiscore-btn');
+        const pathimageButton = document.getElementById('toggle-g-image-btn');
+
+        pathimageButton.textContent = 'Show Path Image';
+
+        // Close the leaderboard if it's open
+        if (leaderboardBox.style.display === 'block') {
+            leaderboardBox.style.display = 'none';
+            leaderboardButton.textContent = 'Show Leaderboard';
+            goToTopButton.style.display = 'none'; // Hide "Go to Top" when leaderboard is hidden
+        }
+    }
+});
+        
+const suggestionsDiv = document.getElementById('suggestions');
+
+// Show suggestions on input or focus
+searchInput.addEventListener('input', function () {
+    showSuggestions(this.value);
+});
+
+// Auto highlight all text on focus
+searchInput.addEventListener('focus', function () {
+    showSuggestions(this.value); // Show filtered songs based on current input
+    setTimeout(() => this.select(), 0); // Highlight text
+});
+
+// Also auto highlight on click
+searchInput.addEventListener('click', function () {
+    setTimeout(() => this.select(), 0);
+});
+
+// Function to display suggestions
+function showSuggestions(query) {
+    suggestionsDiv.innerHTML = '';
+
+    let filteredSongs = [];
+    if (!query) {
+        filteredSongs = songs.slice().sort((a, b) => a.value.localeCompare(b.value)); // All songs
+    } else {
+        filteredSongs = songs
+            .filter(song => song.value.toLowerCase().includes(query.toLowerCase()))
+            .sort((a, b) => a.value.localeCompare(b.value));
+    }
+
+    if (filteredSongs.length > 0) {
+        filteredSongs.forEach(song => {
+            const suggestionItem = document.createElement('div');
+            suggestionItem.textContent = song.value;
+            suggestionItem.onclick = () => selectSong(song);
+            suggestionsDiv.appendChild(suggestionItem);
+        });
+        suggestionsDiv.style.display = 'block';
+    } else {
+        suggestionsDiv.style.display = 'none';
+    }
+}
+
+// Hide suggestions if clicking outside the input or suggestions
+document.addEventListener('click', (e) => {
+    if (e.target !== searchInput && !suggestionsDiv.contains(e.target)) {
+        suggestionsDiv.style.display = 'none';
+    }
+});
+        
+        let selectedSong = null;
+        
+        function formatPath(path) {
+            return path
+                .replace(/G/g, '<span style="color:green">G</span>')
+                .replace(/R/g, '<span style="color:red">R</span>')
+                .replace(/Y/g, '<span style="color:yellow">Y</span>')
+                .replace(/B/g, '<span style="color:blue">B</span>')
+                .replace(/O/g, '<span style="color:orange">O</span>');
+        }
+        
+        function selectSong(song) {
+    selectedSong = song; // Store the selected song for instrument toggle functionality
+    const songDetailsDiv = document.getElementById('song-details');
+    const suggestionsDiv = document.getElementById('suggestions');
+    const searchBox = document.getElementById('song-search');
+    const instrumentButtonsContainer = document.querySelector('.instrument-buttons-container');
+
+    const leaderboardBox = document.getElementById('b-hiscore-box');
+    const leaderboardButton = document.getElementById('show-b-hiscore-btn');
+    const pathImageBox = document.getElementById('g-image-box');
+    const pathImageButton = document.getElementById('toggle-g-image-btn');
+    const goToTopButton = document.getElementById('go-to-top');
+
+    // Hide the leaderboard
+    if (leaderboardBox.style.display === 'block') {
+        leaderboardBox.style.display = 'none';
+        leaderboardButton.textContent = 'Show Leaderboard';
+        goToTopButton.style.display = 'none'; // Hide "Go to Top" when leaderboard is hidden
+    }
+
+    // Hide the path image
+    if (pathImageBox.style.display === 'block') {
+        pathImageBox.style.display = 'none';
+        pathImageButton.textContent = 'Show Path Image';
+    }
+
+    searchBox.value = song.value;
+    suggestionsDiv.innerHTML = '';
+
+    // Show the instrument buttons container
+    instrumentButtonsContainer.style.display = 'block';
+
+    // Show instrument buttons
+    document.getElementById('vocals-btn').style.display = 'inline-block';
+    document.getElementById('lead-btn').style.display = 'inline-block';
+    document.getElementById('bass-btn').style.display = 'inline-block';
+    document.getElementById('drums-btn').style.display = 'inline-block';
+    document.getElementById('pro-lead-btn').style.display = 'inline-block';
+    document.getElementById('pro-bass-btn').style.display = 'inline-block';
+    
+
+// ADD NEW INSTRUMENTS HERE
+// Determine which instrument data to use based on the currentInstrument variable
+    const path = currentInstrument === 'g' ? song.data.gpath :
+                 currentInstrument === 'b' ? song.data.bpath :
+                 currentInstrument === 'd' ? song.data.dpath : // Add this line for drums
+                 currentInstrument === 'v' ? song.data.vpath :  // Add this line for Vocals
+                 currentInstrument === 'l' ? song.data.lpath :  // Add this line for Lead
+                 currentInstrument === 'm' ? song.data.mpath : ''; // Add this line for Bass
+
+    const score = currentInstrument === 'g' ? song.data.gscore :
+                  currentInstrument === 'b' ? song.data.bscore :
+                  currentInstrument === 'd' ? song.data.dscore :  // Add this line for drums
+                  currentInstrument === 'v' ? song.data.vscore :  // Add this line for Vocals
+                  currentInstrument === 'l' ? song.data.lscore :  // Add this line for Lead
+                  currentInstrument === 'm' ? song.data.mscore : ''; // Add this line for Bass
+
+
+    const image = currentInstrument === 'g' ? song.data.g_image :
+                  currentInstrument === 'b' ? song.data.b_image :
+                  currentInstrument === 'd' ? song.data.d_image :  // Add this line for drums
+                  currentInstrument === 'v' ? song.data.v_image :  // Add this line for Vocals
+                  currentInstrument === 'l' ? song.data.l_image :  // Add this line for Lead
+                  currentInstrument === 'm' ? song.data.m_image : ''; // Add this line for Bass
+                  
+
+    // Format the path with colors
+    const formattedPath = formatPath(path)
+        .replace(/, /g, '<br>')
+        .replace(/(\d+)\s*([A-Z]+)/g, '$1 $2')
+        .replace(/(\d+)\/(\d+)/g, '$1/$2')
+        .replace(/\s+/g, ' ');
+
+    const scoreHtml = `<div class="score-box">${score}</div>`;
+    // ADD NEW INSTRUMENTS HERE
+    const instrumentImage = currentInstrument === 'g' ? 'pro_guitar.png' : currentInstrument === 'b' ? 'pro_bass.png' : currentInstrument === 'v' ? 'vocals.png' : currentInstrument === 'm' ? 'bass.png' : currentInstrument === 'l' ? 'guitar.png' : 'drums.png';
+    const instrumentText = currentInstrument === 'g' ? 'Pro Lead' : currentInstrument === 'b' ? 'Pro Bass' : currentInstrument === 'v' ? 'Vocals' : currentInstrument === 'm' ? 'Bass' : currentInstrument === 'l' ? 'Lead' : 'Drums';
+
+const pathHtml = `
+    <div class="path-box">
+        <img src="img/${instrumentImage}" alt="${instrumentText}" class="instrument-icon">
+        <span class="guitar-text"><b><u>${instrumentText}</u></b></span> ${scoreHtml} <br>
+        ${formattedPath}
+    </div>
+`;
+
+    songDetailsDiv.innerHTML = pathHtml;
+
+    // Show the "Show Path Image" button and set its event listener
+    document.getElementById('toggle-g-image-btn').style.display = 'block';
+    document.getElementById('toggle-g-image-btn').onclick = function () {
+        const imageElement = document.getElementById('g-image');
+        const isVisible = imageElement.style.display === 'block';
+        imageElement.style.display = isVisible ? 'none' : 'block';
+        this.textContent = isVisible ? 'Show Path Image' : 'Hide Path Image';
+    };
+
+    // Show the path image box
+    const gImageBox = document.getElementById('g-image-box');
+    gImageBox.style.display = 'block';
+    const imageElement = document.getElementById('g-image');
+    imageElement.src = 'paths/' + image.replace(/'/g, '');
+    imageElement.style.display = 'none';
+
+    // Show the leaderboard button
+    leaderboardButton.style.display = 'block';
+    leaderboardButton.setAttribute('data-song-id', song.data.shortname);
+
+    console.log('Selected song:', song);
+    console.log('Song shortname for leaderboard:', song.data.shortname);
+}
+        document.getElementById('show-b-hiscore-btn').addEventListener('click', function () {
+            const songId = this.getAttribute('data-song-id');
+            const leaderboardBox = document.getElementById('b-hiscore-box');
+            const button = this;
+        
+            console.log('Fetching leaderboard for song ID:', songId);
+            
+            if (button.textContent === 'Show Leaderboard') {
+                fetchLeaderboard(songId);
+                leaderboardBox.style.display = 'block';
+                button.textContent = 'Hide Leaderboard';
+            } else {
+                leaderboardBox.style.display = 'none';
+                goToTopButton.style.display = 'none';
+                button.textContent = 'Show Leaderboard';
+            }
+        });
+        
+        async function fetchLeaderboard(songId) {
+            try {
+                let url;
+
+                if (currentInstrument === 'g' || currentInstrument === 'b') {
+                    // Use the current site for Pro Lead and Pro Bass
+                    // old url = `https://raw.githubusercontent.com/mattfreg/FNF_ProLeaderboards/main/leaderboards/season6/${songId}/Solo_Peripheral${currentInstrument === 'g' ? 'Guitar' : 'Bass'}_0.json`;
+                    url = `https://raw.githubusercontent.com/FNLookup/festival-leaderboards/refs/heads/main/leaderboards/season9/${songId}/Solo_Peripheral${currentInstrument === 'g' ? 'Guitar' : 'Bass'}_0.json`;
+
+                } else {
+                    // Use the alternative site for other instruments
+                    const instrumentMap = {
+                        v: 'Vocals',
+                        m: 'Bass',
+                        l: 'Guitar',
+                        d: 'Drums'
+                    };
+                    const selectedInstrument = instrumentMap[currentInstrument];
+                    url = `https://raw.githubusercontent.com/FNLookup/festival-leaderboards/refs/heads/main/leaderboards/season9/${songId}/Solo_${selectedInstrument}_0.json`;
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const data = await response.json();
+                if (Array.isArray(data.entries) && data.entries.length > 0) {
+                    updateLeaderboardTable(data.entries);
+                } else {
+                    updateLeaderboardTable([]);
+                }
+            } catch (error) {
+                console.error('Error fetching leaderboard data:', error);
+                updateLeaderboardTable([]); // Clear table on error
+            }
+        }
+
+        function updateLeaderboardTable(entries) {
+            const tableBody = document.getElementById('b-hiscore-table');
+            tableBody.innerHTML = '';
+        
+            if (entries.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5">No leaderboard data available</td></tr>';
+                return;
+            }
+        
+            entries.forEach(entry => {
+                const row = document.createElement('tr');
+        
+                if (entry.rank === 1) {
+                    row.style.backgroundColor = 'gold';
+                    row.style.color = 'black';
+                } else if (entry.rank === 2) {
+                    row.style.backgroundColor = 'silver';
+                    row.style.color = 'black';
+                } else if (entry.rank === 3) {
+                    row.style.backgroundColor = '#cd7f32'; // Bronze color
+                    row.style.color = 'white';
+                } else {
+                    row.style.backgroundColor = '#1e1e1e'; // Default background
+                    row.style.color = 'white';
+                }
+        
+                row.innerHTML = `
+                    <td>${entry.rank || 'N/A'}</td>
+                    <td>${entry.userName || 'N/A'}</td>
+                    <td>${entry.best_run.score || 'N/A'}</td>
+                    <td>${entry.best_run.accuracy !== undefined ? entry.best_run.accuracy + '%' : 'N/A'}</td>
+                    <td>${entry.best_run.fullcombo ? 'FC' : ''}</td>
+                `;
+        
+                tableBody.appendChild(row);
+            });
+        }
+        
+        </script>
+</body>
+</html>
