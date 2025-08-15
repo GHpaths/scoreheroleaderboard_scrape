@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 import yaml from "js-yaml";
 import puppeteer from "puppeteer";
 
@@ -60,8 +60,8 @@ async function main() {
     try {
       const leaderboard = await scrapeLeaderboard(info.leaderboards);
 
-      const outPath = path.join(OUTPUT_DIR, `${shortname}_all_leaderboards.json`);
-      fs.writeFileSync(outPath, JSON.stringify({ entries: leaderboard }, null, 2));
+    const outputPath = path.join(process.cwd(), `${shortname}.json`);
+    fs.writeFileSync(outputPath, JSON.stringify(data, null, 2));
       console.log(`Saved ${outPath} with ${leaderboard.length} entries.`);
     } catch (err) {
       console.error(`Error scraping ${shortname}:`, err);
