@@ -30,8 +30,9 @@ async function scrapeLeaderboard(url) {
         return {
           rank: rankText,
           player: cols[1].innerText.trim(),
-          score: cols[2].innerText.trim(),
-          percentage: cols[3].innerText.trim(),
+          score: cols[3].innerText.trim(),
+          // percentage: cols[8].innerText.trim(),
+          platform: cols[2].innerText.trim(),
         };
       })
       .filter(Boolean);
@@ -46,8 +47,7 @@ async function main() {
   console.log("Reading YAML file...");
   const fileContents = fs.readFileSync(YAML_FILE, "utf8");
   const leaderboardsYAML = yaml.load(fileContents);
-
-  for (const [shortname, info] of Object.entries(leaderboardsYAML.GH3)) {
+  for (const [shortname, info] of Object.entries(leaderboardsYAML)) {
     if (!info.leaderboards) {
       console.log(`Skipping ${shortname}, no leaderboard URL found.`);
       continue;
@@ -57,7 +57,7 @@ async function main() {
     try {
       const leaderboard = await scrapeLeaderboard(info.leaderboards);
 
-      const outPath = path.join(OUTPUT_DIR, `${shortname}.json`);
+      const outPath = path.join(OUTPUT_DIR, `${shortname}_all_leaderboards.json`);
       fs.writeFileSync(outPath, JSON.stringify({ entries: leaderboard }, null, 2));
       console.log(`Saved ${outPath} with ${leaderboard.length} entries.`);
     } catch (err) {
