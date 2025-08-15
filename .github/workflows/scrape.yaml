@@ -1,34 +1,34 @@
-name: Update ScoreHero Leaderboard
+name: Scrape ScoreHero Leaderboard
 
 on:
   schedule:
-    # Runs every 6 hours
-    - cron: '0 */6 * * *'
-  workflow_dispatch: # manual trigger
+    # Runs every day at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # allows manual trigger
 
 jobs:
   scrape:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
 
       - name: Install dependencies
-        run: npm install puppeteer
+        run: npm install
 
-      - name: Run Scraper
+      - name: Run leaderboard scraper
         run: node scraper.js
 
-      - name: Commit and Push updated leaderboard
+      - name: Commit updated leaderboard
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add leaderboard.json
-          git commit -m "Update leaderboard [skip ci]" || echo "No changes to commit"
+          git diff --quiet && echo "No changes to commit" || git commit -m "Update leaderboard [skip ci]"
           git push
