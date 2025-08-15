@@ -1,40 +1,42 @@
-import puppeteer from 'puppeteer';
-import fs from 'fs-extra';
+// scraper.js
+import puppeteer from "puppeteer";
+import fs from "fs";
 
-const LEADERBOARD_URL = 'https://www.scorehero.com/rankings.php?group=4&game=6&diff=4&song=1416&page=1'; // Replace with the actual page
+const URL = "https://www.scorehero.com/rankings.php?group=4&game=6&diff=4&song=1416&page=1";
 
 async function scrapeLeaderboard() {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-
+  try {
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.goto(LEADERBOARD_URL, { waitUntil: 'networkidle2' });
+    await page.goto(URL, { waitUntil: "domcontentloaded" });
+    await page.waitForSelector("table");
 
-    // Scrape leaderboard data
     const data = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll('table tbody tr'));
-        return rows.map(row => {
-            const cells = row.querySelectorAll('td');
-            return {
-                rank: cells[0]?.innerText.trim(),
-                userName: cells[1]?.innerText.trim(),
-                score: parseInt(cells[2]?.innerText.replace(/,/g, '') || 0),
-                percentage: cells[3]?.innerText.trim(),
-                fullCombo: cells[4]?.innerText.trim() === 'FC'
-            };
-        });
+      const rows = Array.from(document.querySelectorAll("table tr")).slice(1); // skip header
+      return rows
+        .map(row => {
+          const cols = row.querySelectorAll("td");
+          if (!cols || cols.length < 4) return null;
+          const rankText = cols[0].innerText.trim();
+          if (!/^\d/.test(rankText)) return null;
+          return {
+            rank: rankText,
+            player: cols[1].innerText.trim(),
+            score: cols[2].innerText.trim(),
+            percentage: cols[3].innerText.trim()
+          };
+        })
+        .filter(Boolean);
     });
 
     await browser.close();
 
-    // Save to JSON
-    await fs.outputJson('leaderboard.json', { entries: data }, { spaces: 2 });
-    console.log('Leaderboard scraped successfully!');
+    fs.writeFileSync("leaderboard.json", JSON.stringify({ entries: data }, null, 2));
+    console.log(`Leaderboard saved with ${data.length} entries`);
+
+  } catch (err) {
+    console.error("Error scraping leaderboard:", err);
+  }
 }
 
-scrapeLeaderboard().catch(err => {
-    console.error('Error scraping leaderboard:', err);
-    process.exit(1);
-});
+scrapeLeaderboard();
