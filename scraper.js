@@ -42,7 +42,7 @@ async function scrapeLeaderboard(url) {
           rank: rankText,
           player: cols[1].innerText.trim(),
           score: cols[3].innerText.trim(),
-          Percent: cols[8].innerText.trim(),
+          Percent: cols[7].innerText.trim(),
           platform: cols[2].innerText.trim(),
         };
       })
