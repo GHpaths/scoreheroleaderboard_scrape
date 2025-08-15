@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import fs from 'fs-extra';
 
-const LEADERBOARD_URL = 'https://www.scorehero.com/some-leaderboard-url/'; // Replace with the actual page
+const LEADERBOARD_URL = 'https://www.scorehero.com/rankings.php?group=4&game=6&diff=4&song=1416&page=1'; // Replace with the actual page
 
 async function scrapeLeaderboard() {
     const browser = await puppeteer.launch({
